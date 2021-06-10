@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, Pressable } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import styles from "./style";
+import { useNavigation } from "@react-navigation/native";
 
 type VideoListItemProps = {
   video: {
@@ -21,18 +22,24 @@ type VideoListItemProps = {
 
 const VideoListItem = (props: VideoListItemProps) => {
   const { video } = props;
+
+  const navigation = useNavigation();
   // Tính toán thời gian cho 1 phút và 1 giây
   const minutes = Math.floor(video.duration / 60);
   const seconds = video.duration % 60;
 
   let viewsString = video.views.toString();
-  if (video.views > 1000000){
-    viewsString = (video.views / 1000000).toFixed(1) + 'm'
+  if (video.views > 1000000) {
+    viewsString = (video.views / 1000000).toFixed(1) + "m";
   } else if (video.views > 1000) {
-    viewsString = (video.views / 1000).toFixed(1) + 'k'
+    viewsString = (video.views / 1000).toFixed(1) + "k";
   }
+
+  const openVideoPage = () => {
+    navigation.navigate("VideoScreen", { id: video.id });
+  };
   return (
-    <View style={styles.videoCard}>
+    <Pressable onPress={openVideoPage} style={styles.videoCard}>
       {/* Tumbnail */}
       <View>
         <Image
@@ -67,7 +74,7 @@ const VideoListItem = (props: VideoListItemProps) => {
         {/* Icon */}
         <Entypo name="dots-three-vertical" size={18} color="white" />
       </View>
-    </View>
+    </Pressable>
   );
 };
 
