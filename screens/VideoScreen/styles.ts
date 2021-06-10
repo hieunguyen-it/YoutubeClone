@@ -5,7 +5,7 @@ const styles = StyleSheet.create({
     width: "100%",
     aspectRatio: 16 / 9,
   },
-  videoInfoContaier: {
+  videoInfoContainer: {
     margin: 10,
   },
   title: {
@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     marginVertical: 10,
   },
-  tag: {
+  tags: {
     color: "#0094e3",
     fontSize: 14,
     fontWeight: "500",

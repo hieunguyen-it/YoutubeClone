@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   View,
   Image,
@@ -7,29 +7,43 @@ import {
   ScrollView,
   FlatList,
   Platform,
+  Pressable,
 } from "react-native";
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+} from "@gorhom/bottom-sheet";
 import video from "../../assets/data/video.json";
 import videos from "../../assets/data/videos.json";
 import VideoListItem from "../../components/VideoListItem";
 import VideoPlayer from "../../components/VideoPlayer";
+import VideoComments from "../../components/VideoComments";
+import VideoComment from "../../components/VideoComment";
 import { AntDesign } from "@expo/vector-icons";
 import styles from "./styles";
 
+import comments from "../../assets/data/comments.json";
+
 const VideoScreen = () => {
+  const CommentsSheetRef = useRef<BottomSheetModal>(null);
+
   let viewsString = video.views.toString();
   if (video.views > 1000000) {
     viewsString = (video.views / 1000000).toFixed(1) + "m";
   } else if (video.views > 1000) {
     viewsString = (video.views / 1000).toFixed(1) + "k";
   }
+
+  const openComments = () => {
+    CommentsSheetRef.current?.present();
+  };
   return (
     <View style={{ backgroundColor: "#141414", flex: 1 }}>
-      {/* Video Play */}
+      {/* Video Player */}
       <VideoPlayer videoURI={video.videoUrl} thumbnailURI={video.thumbnail} />
-      {/* <Image style={styles.videoPlayer} source={{ uri: video.thumbnail }} /> */}
       {/* Video Info */}
-      <View style={styles.videoInfoContaier}>
-        <Text style={styles.tag}>{video.tags}</Text>
+      <View style={styles.videoInfoContainer}>
+        <Text style={styles.tags}>{video.tags}</Text>
         <Text style={styles.title}>{video.title}</Text>
         <Text style={styles.subtitle}>
           {video.user.name} {viewsString} {video.createdAt}
@@ -109,28 +123,23 @@ const VideoScreen = () => {
         </Text>
       </View>
       {/* Comments */}
-      <View style={{ padding: 10, marginVertical: 10 }}>
+      <Pressable
+        onPress={openComments}
+        style={{ padding: 10, marginVertical: 10 }}
+      >
         <Text style={{ color: "white" }}>Comment 888</Text>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginVertical: 10,
-          }}
-        >
-          <Image
-            style={{ width: 35, height: 35, borderRadius: 20 }}
-            source={{ uri: video.user.image }}
-          />
-          <View style={{ marginHorizontal: 10, flex: 1 }}>
-            <Text style={{ color: "white", marginLeft: 10 }}>
-              Hey Vadim, you got me started a couple of weeks ago and now it's
-              going great. So thank you! Ever thought about going with a prop
-              based styling?
-            </Text>
-          </View>
-        </View>
-      </View>
+        <VideoComment comment={comments[0]} />
+      </Pressable>
+      <BottomSheetModal
+        ref={CommentsSheetRef}
+        snapPoints={["70%"]}
+        index={0}
+        backgroundComponent={({ style }) => (
+          <View style={[style, { backgroundColor: "#4d4d4d" }]} />
+        )}
+      >
+        <VideoComments />
+      </BottomSheetModal>
     </View>
   );
 };
@@ -144,11 +153,14 @@ const VideoScreenWithRecommendation = () => {
         paddingTop: Platform.OS === "android" ? 30 : 0,
       }}
     >
-      <FlatList
-        data={videos}
-        renderItem={({ item }) => <VideoListItem video={item} />}
-        ListHeaderComponent={VideoScreen}
-      />
+      <BottomSheetModalProvider>
+        <VideoScreen />
+        <FlatList
+          data={videos}
+          renderItem={({ item }) => <VideoListItem video={item} />}
+          ListHeaderComponent={VideoScreen}
+        />
+      </BottomSheetModalProvider>
     </SafeAreaView>
   );
 };
